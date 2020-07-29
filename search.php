@@ -7,7 +7,7 @@ $client = ClientBuilder::create()
     ->build();
 
 $params = [
-    'size' => 2,
+    'size' => 20,
     //'scroll' => '3s',
     'index' => 'catalog',
     'type' => 'item',
@@ -25,13 +25,14 @@ $params = [
 $results = $client->search($params);
 
 if ($results['hits']['total']['value'] == 1) {
-    echo "полное совпадение по артикулу:<br>";
-    echo '<pre>', print_r($results, true), '</pre>';
+    //echo "полное совпадение по артикулу:<br>";
+    // echo '<pre>', print_r($results, true), '</pre>';
+    echo json_encode($results);
 } else {
-    echo "не артикул, - ищем дальше";
-    echo "...<br>";
+    //echo "не артикул, - ищем дальше";
+    //echo "...<br>";
     $params = [
-        'size' => 5,
+        'size' => 20,
         //'scroll' => '3s',
         'index' => 'catalog',
         'type' => 'item',
@@ -48,10 +49,10 @@ if ($results['hits']['total']['value'] == 1) {
     ];
     $results = $client->search($params);
     if ($results['hits']['total']['value'] < 1) {
-        echo "нет совпадений";
+        //echo "нет совпадений";
         $params = [
             'index' => 'catalog',
-            'size' => 2,
+            'size' => 20,
             'type' => 'item',
             'body' => [
                 'query' => [
@@ -73,12 +74,14 @@ if ($results['hits']['total']['value'] == 1) {
         ];
         $results = $client->search($params);
 
-        echo '<pre>', print_r($results, true), '</pre>';
+        //echo '<pre>', print_r($results, true), '</pre>';
+        echo json_encode($results);
 
 
     } else {
-        echo "полное совпадение по артикулу + имя:<br>";
-        echo '<pre>', print_r($results, true), '</pre>';
+        //echo "полное совпадение по артикулу + имя:<br>";
+        //echo '<pre>', print_r($results, true), '</pre>';
+        echo json_encode($results);
     }
 }
 
