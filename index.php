@@ -11,30 +11,16 @@ $client = ClientBuilder::create()
     ->build();
 
 $start = microtime(true);
-/*
-$backInTime = date('Y-m-d H:i:s');
-$backInTime = date_modify($backInTime, '+15 minutes');
-echo date('Y-m-d H:i:s');
-echo "<br>";
-echo $backInTime;
-*/
-$date = date('Y-m-d H:i:s');
-$backInTime = '-15 minutes';
-
-
+// фильтруем каталог по свойствам, используем только активные на данный момент товары
 $arFilter = array(
     "IBLOCK_ID" => 18,
     "ACTIVE_DATE" => "Y",
     "ACTIVE" => "Y",
-    "DATE_MODIFY_FROM" => date('Y-m-d H:i:s', strtotime($date . $backInTime)),
-    //"DATE_MODIFY_TO" => date('Y-m-d H:i:s'),
-    "PROPERTY_TOVARMIKROSA_VALUE" => "Да"
 );
-
-$arGroup = array(
-    //"nTopCount" => 50
+// группировку не используем
+$arGroup = array(//"nTopCount" => 50
 );
-
+// добавляем нужные свойства в индекс
 $arSelect = array(
     "ID",
     "DETAIL_PICTURE",
@@ -56,86 +42,31 @@ $res = CIBlockElement::GetList(
     $arGroup,
     $arSelect
 );
-$num = 0;
+
 while ($ob = $res->GetNextElement()) {
     $arFields = $ob->GetFields();
-    echo "<br>" . ++$num;
-    echo "<pre>";
-    print_r($arFields);
-    echo "</pre>";
 
+    $params = [
+        'index' => 'catalog',
+        'type' => 'item',
+        'id' => $arFields["ID"],
+        'body' => [
+            'NAME' => $arFields["NAME"],
+            'ARTICLE' => $arFields["PROPERTY_CML2_ARTICLE_VALUE"],
+            'URL' => $arFields["DETAIL_PAGE_URL"],
+            'DETAIL_PICTURE' => CFile::GetPath($arFields["DETAIL_PICTURE"]),
+            'TOVARMIKROSA' => $arFields["PROPERTY_TOVARMIKROSA_VALUE"],
+            'MARKETPLEYS' => $arFields["PROPERTY_TOVAR_MARKETPLEYS_VALUE"],
+            'OZHIDAEMYY_PRIKHOD' => $arFields["PROPERTY_OTOBRAZHAT_OZHIDAEMYY_PRIKHOD_VALUE"],
+            'DETAIL_TEXT' => $arFields["DETAIL_TEXT"],
 
-/*
-    $arSelect2 = array("ID", "NAME", "CODE");
-    $res2 = CIBlockElement::GetElementGroups($arFields['ID'], true, $arSelect2);
-    while ($ob = $res2->Fetch()) {
-        print_r($ob);
-    }*/
+        ]
+    ];
+
+    $response = $client->index($params);
 }
 
-/*
-echo $arFields["NAME"];
-echo "<br>";
-echo $arFields["ID"];
-echo "<br>";
-echo $arFields["PROPERTY_CML2_ARTICLE_VALUE"];
-echo "<br>";
-echo $arFields["DETAIL_PAGE_URL"];
-echo "<br>";
-echo $arFields["PROPERTY_TOVAR_MARKETPLEYS_VALUE"];
-echo "<br>";
-echo $arFields["PROPERTY_TOVARMIKROSA_VALUE"];
-echo "<br>";
-echo $arFields["PROPERTY_OTOBRAZHAT_OZHIDAEMYY_PRIKHOD_VALUE"];
-echo "<br>";
-echo $arFields["IBLOCK_SECTION_ID"];
-echo "<br>";
-echo CFile::GetPath($arFields["DETAIL_PICTURE"]);
-echo "<br>";
-echo $arFields["DETAIL_TEXT"];
-echo "<br><br>";
-*/
-/*
-$params = [
-    'index' => 'catalog',
-    'type'    => 'item',
-    'id'    => $arFields["ID"],
-    'body'  => [
-        'NAME' => $arFields["NAME"],
-        'ARTICLE' => $arFields["PROPERTY_CML2_ARTICLE_VALUE"],
-        'URL' => $arFields["DETAIL_PAGE_URL"],
-        'DETAIL_PICTURE' => CFile::GetPath($arFields["DETAIL_PICTURE"]),
-        'TOVARMIKROSA' => $arFields["PROPERTY_TOVARMIKROSA_VALUE"],
-        'MARKETPLEYS' => $arFields["PROPERTY_TOVAR_MARKETPLEYS_VALUE"],
-        'OZHIDAEMYY_PRIKHOD' => $arFields["PROPERTY_OTOBRAZHAT_OZHIDAEMYY_PRIKHOD_VALUE"],
-        'DETAIL_TEXT' => $arFields["DETAIL_TEXT"],
-
-        ]
-];*/
-//print_r($params);
-
-//$response = $client->index($params);
-//UPDATE
-/*
-$paramsUp = [
-    'index' => 'catalog',
-    'type'    => 'item',
-    'id'    => $arFields["ID"],
-    'body'  => [
-        'doc' => [
-            'MATERIAL' => $arFields["PROPERTY_MATERIAL_VALUE"]
-
-        ]
-    ]
-];
-*/
-// Update doc at /my_index/_doc/my_id
-//$response = $client->update($paramsUp);
-
-
-//}
-
+// считаем время выплнения скрипта
 $date = date("m.d.y");
 $time = date("H:i:s");
-
 echo $line = $date . " - " . $time . ': Время выполнения скрипта: ' . round(microtime(true) - $start, 4) . ' сек.';
