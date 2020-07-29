@@ -19,24 +19,28 @@ echo "<br>";
 echo $backInTime;
 */
 $date = date('Y-m-d H:i:s');
-$backInTime = '-15 minutes';
+$backInTime = '-20 minutes';
 
+echo date('d.m.Y H:i:s', strtotime($date . $backInTime));
 
 $arFilter = array(
     "IBLOCK_ID" => 18,
     "ACTIVE_DATE" => "Y",
     "ACTIVE" => "Y",
-    //"DATE_MODIFY_FROM" => date('Y-m-d H:i:s', strtotime($date . $backInTime)),
-    //"DATE_MODIFY_TO" => date('Y-m-d H:i:s'),
-    "PROPERTY_TOVARMIKROSA_VALUE" => "Да"
+    "PROPERTY_OTOBRAZHAT_OZHIDAEMYY_PRIKHOD_VALUE" => "Нет",
+    ">TIMESTAMP_X" => date('d.m.Y H:i:s', strtotime($date . $backInTime)),
 );
+
+echo "<pre>";
+print_r($arFilter);
+echo "</pre>";
 
 $arGroup = array(
     //"nTopCount" => 50
 );
 
 $arSelect = array(
-    "ID",
+  /*  "ID",
     "DETAIL_PICTURE",
     "NAME",
     "IBLOCK_SECTION_ID",
@@ -44,9 +48,7 @@ $arSelect = array(
     "DETAIL_PAGE_URL",
     "PROPERTY_CML2_ARTICLE",
     "PROPERTY_TOVAR_MARKETPLEYS",
-    "PROPERTY_TOVARMIKROSA",
-    "PROPERTY_OTOBRAZHAT_OZHIDAEMYY_PRIKHOD",
-    "PROPERTY_MATERIAL"
+    "PROPERTY_TOVARMIKROSA",*/
 );
 
 $res = CIBlockElement::GetList(

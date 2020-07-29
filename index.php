@@ -58,8 +58,7 @@ while ($ob = $res->GetNextElement()) {
             'TOVARMIKROSA' => $arFields["PROPERTY_TOVARMIKROSA_VALUE"],
             'MARKETPLEYS' => $arFields["PROPERTY_TOVAR_MARKETPLEYS_VALUE"],
             'OZHIDAEMYY_PRIKHOD' => $arFields["PROPERTY_OTOBRAZHAT_OZHIDAEMYY_PRIKHOD_VALUE"],
-            'DETAIL_TEXT' => $arFields["DETAIL_TEXT"],
-
+            //'DETAIL_TEXT' => $arFields["DETAIL_TEXT"],
         ]
     ];
 
