@@ -26,8 +26,8 @@ $results = $client->search($params);
 
 if ($results['hits']['total']['value'] == 1) {
     //echo "полное совпадение по артикулу:<br>";
-    // echo '<pre>', print_r($results, true), '</pre>';
-    echo json_encode($results);
+   // echo '<pre>', print_r($results, true), '</pre>';
+    echo json_encode($results, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
 } else {
     //echo "не артикул, - ищем дальше";
     //echo "...<br>";
@@ -75,13 +75,13 @@ if ($results['hits']['total']['value'] == 1) {
         $results = $client->search($params);
 
         //echo '<pre>', print_r($results, true), '</pre>';
-        echo json_encode($results);
+        echo json_encode($results, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
 
 
     } else {
         //echo "полное совпадение по артикулу + имя:<br>";
         //echo '<pre>', print_r($results, true), '</pre>';
-        echo json_encode($results);
+        echo json_encode($results, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
     }
 }
 
