@@ -1,8 +1,8 @@
 <?
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php");
-//error_reporting(-1);
-
 require __DIR__ . '/vendor/autoload.php';
+
+//Удаление всех неактивных товаров из индекса
 
 use Elasticsearch\ClientBuilder;
 
@@ -41,14 +41,14 @@ while ($ob = $res->GetNextElement()) {
         'type' => 'item',
         'id' => $arFields["ID"]
     ];
-/*
+
     try {
         $response = $client->delete($params);
         echo $arFields["ID"] . " - удалён из индекса" . "<br>";
     } catch (Exception $e) {
-        echo $arFields["ID"] . " - нет id (Удалить из индекса не получлось)" . "<br>";
+        //echo $arFields["ID"] . " - нет id (Удалить из индекса не получлось)" . "<br>";
     }
-*/
+
 }
 
 $date = date("m.d.y");
