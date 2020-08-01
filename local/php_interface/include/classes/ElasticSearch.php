@@ -1,5 +1,6 @@
 <?
-require '/home/mikros/public_html/dev/ElasticSearch/vendor/autoload.php';
+require '../../vendor/autoload.php';
+//подключение autoload ElasticSearch
 
 use Elasticsearch\ClientBuilder;
 
@@ -64,7 +65,7 @@ class ElasticSearchUpdate
                     'type' => 'item',
                     'id' => $arFields["ID"]
                 ];
-                
+
                 try {
                     $response = $client->delete($params);
                 } catch (Exception $e) {
