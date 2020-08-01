@@ -1,2 +1,2 @@
-/vendor
-/logs
+/dev/ElasticSearch/vendor/
+/dev/ElasticSearch/logs/
