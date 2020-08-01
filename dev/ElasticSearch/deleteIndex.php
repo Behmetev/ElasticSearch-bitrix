@@ -48,7 +48,6 @@ while ($ob = $res->GetNextElement()) {
     } catch (Exception $e) {
         //echo $arFields["ID"] . " - нет id (Удалить из индекса не получлось)" . "<br>";
     }
-
 }
 
 $date = date("m.d.y");
