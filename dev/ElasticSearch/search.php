@@ -8,7 +8,6 @@ $client = ClientBuilder::create()
 
 $params = [
     'size' => 20,
-    //'scroll' => '3s',
     'index' => 'catalog',
     'type' => 'item',
     'body' => [
