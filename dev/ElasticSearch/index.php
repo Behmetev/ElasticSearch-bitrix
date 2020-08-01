@@ -1,8 +1,8 @@
 <?
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php");
-//error_reporting(-1);
-
 require __DIR__ . '/vendor/autoload.php';
+
+//Добавление выбранных товаров в индекс
 
 use Elasticsearch\ClientBuilder;
 
@@ -28,11 +28,6 @@ $arSelect = array(
     "IBLOCK_SECTION_ID",
     "DETAIL_TEXT",
     "DETAIL_PAGE_URL",
-    "PROPERTY_CML2_ARTICLE",
-    "PROPERTY_TOVAR_MARKETPLEYS",
-    "PROPERTY_TOVARMIKROSA",
-    "PROPERTY_OTOBRAZHAT_OZHIDAEMYY_PRIKHOD",
-    "PROPERTY_MATERIAL"
 );
 
 $res = CIBlockElement::GetList(
@@ -55,9 +50,9 @@ while ($ob = $res->GetNextElement()) {
             'ARTICLE' => $arFields["PROPERTY_CML2_ARTICLE_VALUE"],
             'URL' => $arFields["DETAIL_PAGE_URL"],
             'DETAIL_PICTURE' => CFile::GetPath($arFields["DETAIL_PICTURE"]),
-            'TOVARMIKROSA' => $arFields["PROPERTY_TOVARMIKROSA_VALUE"],
-            'MARKETPLEYS' => $arFields["PROPERTY_TOVAR_MARKETPLEYS_VALUE"],
-            'OZHIDAEMYY_PRIKHOD' => $arFields["PROPERTY_OTOBRAZHAT_OZHIDAEMYY_PRIKHOD_VALUE"],
+            //'TOVARMIKROSA' => $arFields["PROPERTY_TOVARMIKROSA_VALUE"],
+            //'MARKETPLEYS' => $arFields["PROPERTY_TOVAR_MARKETPLEYS_VALUE"],
+            //'OZHIDAEMYY_PRIKHOD' => $arFields["PROPERTY_OTOBRAZHAT_OZHIDAEMYY_PRIKHOD_VALUE"],
             //'DETAIL_TEXT' => $arFields["DETAIL_TEXT"],
         ]
     ];
