@@ -1,6 +1,5 @@
 <?
-require '../../vendor/autoload.php';
-//подключение autoload ElasticSearch
+require $_SERVER['DOCUMENT_ROOT'] . '/dev/ElasticSearch/vendor/autoload.php';
 
 use Elasticsearch\ClientBuilder;
 
@@ -13,13 +12,22 @@ class ElasticSearchUpdate
             ->setHosts(['localhost:9200']) // указываем, в виде массива, хост и порт сервера elasticsearch
             ->build();
         if ($arFields["RESULT"]) {
-            if ($arFields["ACTIVE"] == 'Y') { // Если товар стал активным - заносим в индекс
+            if ($arFields["ACTIVE"] == 'Y') {
 
+                $store = array();
                 $group = array();
                 $oldPrice = null;
 
                 $res = CIBlockElement::GetByID($arFields['ID']);
                 $ar_res = $res->GetNext();
+
+                $obStoreProduct = CCatalogStoreProduct::GetList(
+                    array("STORE_ID" => "ASC"),
+                    array("PRODUCT_ID" => $arFields["ID"]),
+                    false,
+                    false,
+                    array("ID", "STORE_ID", "AMOUNT")
+                );
 
                 $db_old_groups = CIBlockElement::GetElementGroups($arFields['ID']);
                 $ind = 0;
@@ -50,34 +58,33 @@ class ElasticSearchUpdate
                             'OLD_PRICE' => $oldPrice
                         ],
                         'SECTIONS' => $group,
+                        //'STORE' => $store
                     ]
                 ];
-
                 try {
                     $response = $client->index($params);
-                    AddMessage2Log("[updateByElementId] - Запись с кодом " . $arFields["ID"] . " изменена.");
+                    //AddMessage2Log("[updateByElementId] - Запись с кодом ".$arFields["ID"]." изменена." );
                 } catch (Exception $e) {
                     AddMessage2Log($e->getMessage());
                 }
-            } else { // Иначе - удаляем из индекса
+            } else {
                 $params = [
                     'index' => 'catalog',
                     'type' => 'item',
                     'id' => $arFields["ID"]
                 ];
-
                 try {
                     $response = $client->delete($params);
                 } catch (Exception $e) {
-                    AddMessage2Log($e->getMessage());
+                    AddMessage2Log("[updateByElementId]" . $e->getMessage());
                 }
-                AddMessage2Log("[updateByElementId] - Запись с кодом " . $arFields["ID"] . " Деактивирована");
+                //AddMessage2Log("[updateByElementId] - Запись с кодом ".$arFields["ID"]." Удалена (Деактивирована)" );
             }
         } else {
             AddMessage2Log("[updateByElementId] - Ошибка изменения записи " . $arFields["ID"] . " (" . $arFields["RESULT_MESSAGE"] . ").");
         }
     }
-    // создаем обработчик события "OnAfterIBlockElementAdd"
+
     function addByElementId(&$arFields)
     {
         $client = ClientBuilder::create()
@@ -85,11 +92,20 @@ class ElasticSearchUpdate
             ->build();
         if ($arFields["RESULT"]) {
 
+            $store = array();
             $group = array();
             $oldPrice = null;
 
             $res = CIBlockElement::GetByID($arFields['ID']);
             $ar_res = $res->GetNext();
+
+            $obStoreProduct = CCatalogStoreProduct::GetList(
+                array("STORE_ID" => "ASC"),
+                array("PRODUCT_ID" => $arFields["ID"]),
+                false,
+                false,
+                array("ID", "STORE_ID", "AMOUNT")
+            );
 
             $db_old_groups = CIBlockElement::GetElementGroups($arFields['ID']);
             $ind = 0;
@@ -120,21 +136,20 @@ class ElasticSearchUpdate
                         'OLD_PRICE' => $oldPrice
                     ],
                     'SECTIONS' => $group,
+                    //'STORE' => $store
                 ]
             ];
-
             try {
                 $response = $client->index($params);
-                AddMessage2Log("[addByElementId] - Запись с кодом " . $arFields["ID"] . " изменена.");
+                //AddMessage2Log("[addByElementId] - Запись с кодом ".$arFields["ID"]." изменена." );
             } catch (Exception $e) {
-                AddMessage2Log($e->getMessage());
+                AddMessage2Log("[addByElementId] - " . $e->getMessage());
             }
         }
     }
-    // создаем обработчик события "OnAfterIBlockElementDelete"
+
     function deleteByElementId(&$arFields)
     {
-        //AddMessage2Log($arFields);
         $client = ClientBuilder::create()
             ->setHosts(['localhost:9200']) // указываем, в виде массива, хост и порт сервера elasticsearch
             ->build();
@@ -144,18 +159,16 @@ class ElasticSearchUpdate
             'type' => 'item',
             'id' => $arFields["ID"]
         ];
-
         try {
             $response = $client->delete($params);
-            AddMessage2Log("[deleteByElementId] - Запись с кодом " . $arFields["ID"] . " Удалена");
+            //AddMessage2Log("[deleteByElementId] - Запись с кодом ".$arFields["ID"]." Удалена" );
         } catch (Exception $e) {
-            AddMessage2Log($e->getMessage());
+            AddMessage2Log("[deleteByElementId] - " . $e->getMessage());
         }
     }
-    // создаем обработчик события "OnBeforePriceUpdate"
+
     function onBeforePriceUpdate($id, $arFields)
     {
-        //AddMessage2Log($arFields);
         $client = ClientBuilder::create()
             ->setHosts(['localhost:9200']) // указываем, в виде массива, хост и порт сервера elasticsearch
             ->build();
@@ -172,13 +185,16 @@ class ElasticSearchUpdate
                 ]
             ]
         ];
-
-        $response = $client->update($params);
+        try {
+            $response = $client->update($params);
+            //AddMessage2Log("[onBeforePriceUpdate] - Цена с кодом ". $arFields['PRODUCT_ID'] ." обновлена" );
+        } catch (Exception $e) {
+            AddMessage2Log("[onBeforePriceUpdate] - " . $e->getMessage());
+        }
     }
-    // создаем обработчик события "OnStoreProductUpdate"
+
     function onStoreProductUpdate($id, $arFields)
     {
-        //AddMessage2Log($arFields);
         $client = ClientBuilder::create()
             ->setHosts(['localhost:9200']) // указываем, в виде массива, хост и порт сервера elasticsearch
             ->build();
@@ -195,7 +211,11 @@ class ElasticSearchUpdate
                 ]
             ]
         ];
-
-        $response = $client->update($params);
+        try {
+            $response = $client->update($params);
+            //AddMessage2Log("[onStoreProductUpdate] - Склады с кодом " . $arFields['PRODUCT_ID'] . " обновлены");
+        } catch (Exception $e) {
+            AddMessage2Log("[onStoreProductUpdate] - " . $e->getMessage());
+        }
     }
 }
