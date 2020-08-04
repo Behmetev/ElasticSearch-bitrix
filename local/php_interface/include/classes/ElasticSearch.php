@@ -5,7 +5,7 @@ use Elasticsearch\ClientBuilder;
 
 class ElasticSearchUpdate
 {
-    // создаем обработчик события "OnAfterIBlockElementUpdate"
+    // создаем обработчик события "OnAfterIBlockElementUpdate" 
     function updateByElementId(&$arFields)
     {
         $client = ClientBuilder::create()
@@ -14,7 +14,6 @@ class ElasticSearchUpdate
         if ($arFields["RESULT"]) {
             if ($arFields["ACTIVE"] == 'Y') {
 
-                $store = array();
                 $group = array();
                 $oldPrice = null;
 
@@ -57,7 +56,7 @@ class ElasticSearchUpdate
                             'OLD_PRICE' => $oldPrice
                         ],
                         'SECTIONS' => $group,
-                        //'STORE' => $store                    ]
+
                 ];
                 try {
                     $response = $client->index($params);
